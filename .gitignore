@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Streamlit secrets (실제 키)
+.streamlit/secrets.toml
+
+# 강사가 zip을 풀어 만든 평문 정답 — 절대 커밋 금지
+/rag_answer/
+/rag_solution/
+.build/
+
+# 빌드 산출물
+index.faiss
+index_meta.json
+.DS_Store
