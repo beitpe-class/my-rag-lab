@@ -1,5 +1,7 @@
 streamlit>=1.31
 sentence-transformers>=2.6
+torch>=2.2              # 임베딩 백엔드 (Windows/PyPI 휠은 CPU 전용) — 명시적 고정
+torchvision>=0.17       # transformers 이미지 모델 import 로그 노이즈 제거용
 faiss-cpu>=1.8
 google-generativeai>=0.7
 pypdf>=4.2
