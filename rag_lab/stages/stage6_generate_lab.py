@@ -99,18 +99,19 @@ def generate(prompt, context, provider="auto", model=None, temperature=0.2):
 
 
 def llm_controls(prefix=""):
-    """[제공] Gemini/Ollama 선택 위젯 → (provider, model) 반환.
-    generate(prompt, ctx, provider, model) 에 그대로 넘겨 쓰면 된다."""
+    """[제공] Gemini/Ollama 제공자·모델 선택 위젯 → (provider, model) 반환.
+    Ollama 선택 시 설치된 모델을 드롭다운으로 표시(미연결이면 입력 + 안내).
+    Stage 6·7·8 공용 — generate(prompt, ctx, provider, model) 에 그대로 넘겨 쓰면 된다."""
     label = st.radio("LLM 제공자", ["자동", "Gemini(클라우드)", "Ollama(로컬)"],
-                     horizontal=True, key=f"{prefix}prov")
+                     horizontal=True, key=f"{prefix}provider")
     provider = {"자동": "auto", "Gemini(클라우드)": "gemini", "Ollama(로컬)": "ollama"}[label]
     model = None
     if provider == "ollama":
         models = _ollama_models()
         if models:
-            model = st.selectbox("Ollama 모델", models, key=f"{prefix}model")
+            model = st.selectbox("Ollama 모델", models, key=f"{prefix}model_o")
         else:
-            model = st.text_input("Ollama 모델", OLLAMA_MODEL, key=f"{prefix}model_t")
+            model = st.text_input("Ollama 모델", OLLAMA_MODEL, key=f"{prefix}model_ot")
             st.caption("⚠️ Ollama 미연결 — `ollama serve` 후 `ollama pull` 필요")
     return provider, model
 
