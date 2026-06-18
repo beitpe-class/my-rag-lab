@@ -70,7 +70,7 @@ def render(kb, k):
     st.caption("선택한 LLM 으로 모든 질문을 채점합니다. 로컬 모델은 문항 수만큼 시간이 걸립니다.")
 
     cset1, cset2 = st.columns(2)
-    if cset1.button("📋 샘플 테스트표 불러오기", use_container_width=True):
+    if cset1.button("📋 샘플 테스트표 불러오기", width='stretch'):
         try:
             st.session_state.lab_test_df = pd.read_csv("eval_questions.csv")
         except Exception:  # noqa: BLE001
@@ -83,8 +83,8 @@ def render(kb, k):
                                       "expected_source": "", "trap": 0}]))
     st.markdown("**① 테스트표 작성/수정**")
     test_df = st.data_editor(st.session_state.lab_test_df, num_rows="dynamic",
-                             use_container_width=True, height=240, key="lab_test_editor")
-    if st.button("▶ 전체 실행 & 채점", use_container_width=True):
+                             width='stretch', height=240, key="lab_test_editor")
+    if st.button("▶ 전체 실행 & 채점", width='stretch'):
         with st.spinner(f"{provider} 로 채점 중..."):
             st.session_state.lab_eval_res = run_eval(test_df, k, provider, model)
     if "lab_eval_res" in st.session_state:
@@ -93,7 +93,7 @@ def render(kb, k):
             st.warning("채점할 질문이 없습니다 — 테스트표에 질문을 입력하세요.")
             return
         st.markdown("**② 결과 검수** — verdict 를 정답/부분/오답으로 판정")
-        edited = st.data_editor(res, use_container_width=True, height=320, key="lab_eval_review")
+        edited = st.data_editor(res, width='stretch', height=320, key="lab_eval_review")
         acc, src_rate, halluc, top = eval_metrics(edited)
         m1, m2, m3, m4 = st.columns(4)
         m1.metric("검수 정답률", f"{acc*100:.0f}%" if acc is not None else "-")

@@ -52,4 +52,4 @@ def render(kb):
                        for r in kb["records"]])
     st.write(f"총 청크: **{len(df)}개** · 평균 길이 {df['길이'].mean():.0f}자")
     st.bar_chart(df["길이"])
-    st.dataframe(df, use_container_width=True, height=300)
+    st.dataframe(df, width='stretch', height=300)

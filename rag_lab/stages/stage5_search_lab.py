@@ -38,4 +38,4 @@ def render(kb, k):
         st.dataframe(pd.DataFrame([
             {"순위": i + 1, "source": h["source"], "chunk_id": h["chunk_id"],
              "유사도": round(h["score"], 3), "미리보기": h["text"][:80]}
-            for i, h in enumerate(hits)]), use_container_width=True)
+            for i, h in enumerate(hits)]), width='stretch')
