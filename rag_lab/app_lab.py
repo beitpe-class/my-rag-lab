@@ -19,6 +19,35 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 import streamlit as st
 
+
+# --- Windows 프리플라이트: VC++ 재배포 누락 시 torch(c10.dll) 로드 실패를 친절히 안내 ---
+def _preflight_torch():
+    """깨끗한 Windows PC 에서 torch import 가 VC++ 재배포 패키지 누락으로 실패하면
+    (DLL load failed / WinError 126) 트레이스백 대신 설치 안내를 띄우고 멈춘다.
+    macOS/Linux 에서는 아무 일도 하지 않는다."""
+    import sys
+    if sys.platform != "win32":
+        return
+    try:
+        import torch  # noqa: F401  (c10.dll → MSVC 런타임 DLL 의존 로드)
+    except Exception as e:  # noqa: BLE001
+        winerr = getattr(e, "winerror", None)
+        low = str(e).lower()
+        if winerr == 126 or "126" in low or "dll load failed" in low or "c10" in low:
+            st.error(
+                "**PyTorch 로드 실패 — Microsoft Visual C++ 재배포 패키지가 필요합니다.**\n\n"
+                "torch 의 `c10.dll` 이 MSVC 런타임 DLL 에 의존하는데 이 PC 에 설치돼 있지 "
+                "않습니다. (torch 설치 문제가 아니라 Windows 런타임 누락입니다.)\n\n"
+                "**해결:** 아래를 설치 → 터미널을 새로 열고 → 앱을 다시 실행하세요.\n\n"
+                "📥 https://aka.ms/vs/17/release/vc_redist.x64.exe"
+            )
+            st.caption(f"원본 오류: {e}")
+            st.stop()
+        raise  # VC++ 와 무관한 오류는 그대로 표면화
+
+
+_preflight_torch()
+
 from stages.stage1_load_lab import load_documents
 from stages.stage2_chunk_lab import make_chunks
 from stages.stage3_embed_lab import get_model, embed
