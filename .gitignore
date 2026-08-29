@@ -17,3 +17,8 @@ venv/
 index.faiss
 index_meta.json
 .DS_Store
+
+# zip 재생성 시 남는 백업본
+*.zip.bak*
+*.zip.orig
+*.zip.prev

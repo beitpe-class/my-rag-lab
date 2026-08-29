@@ -52,7 +52,7 @@ from stages.stage1_load_lab import load_documents
 from stages.stage2_chunk_lab import make_chunks
 from stages.stage3_embed_lab import get_model, embed
 from stages.stage4_store_lab import build_index
-from stages.stage6_generate_lab import _get_api_key
+from stages.stage6_generate_lab import active_provider
 from stages import (stage1_load_lab, stage2_chunk_lab, stage3_embed_lab, stage4_store_lab,
                     stage5_search_lab, stage6_generate_lab, stage7_chat_lab, stage8_eval_lab)
 
@@ -152,8 +152,13 @@ with st.sidebar:
         kb.clear()
         st.success("초기화 완료")
 
-    if not _get_api_key():
-        st.info("GEMINI_API_KEY 미설정 — Gemini 키 없으면 로컬 Ollama 로 생성(가능 시)")
+    _PROVIDER_NOTE = {
+        "claude": "생성기: Claude (CLAUDE_API_KEY 감지)",
+        "gemini": "생성기: Gemini (GEMINI_API_KEY 감지)",
+        "ollama": "LLM 키 미설정 — 로컬 Ollama 로 생성(가능 시). "
+                  "CLAUDE_API_KEY 또는 GEMINI_API_KEY 를 설정하면 클라우드 모델을 씁니다.",
+    }
+    st.info(_PROVIDER_NOTE[active_provider()])
 
 tabs = st.tabs(["1.적재/파싱", "2.청킹", "3.임베딩", "4.저장",
                 "5.검색", "6.생성", "7.챗봇", "8.평가/검수"])
