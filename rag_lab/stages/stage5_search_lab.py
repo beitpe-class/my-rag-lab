@@ -23,8 +23,18 @@ def retrieve(query, k):
             r = dict(kb["records"][i]); r["score"] = float(scores[0][rank])
             hits.append(r)
     """
-    # ✏️ TODO: 질문 임베딩 → 검색 → hits(점수 포함) 반환을 구현하세요.
-    raise NotImplementedError("retrieve 를 구현하세요 (Stage 5)")
+    kb = st.session_state.kb
+    model = get_model(kb["model_name"])
+    q = model.encode([query], normalize_embeddings=True).astype("float32")
+    scores, idx = kb["index"].search(q, k)
+    hits = []
+    for rank, i in enumerate(idx[0]):
+        if i < 0:
+            continue
+        r = dict(kb["records"][i])
+        r["score"] = float(scores[0][rank])
+        hits.append(r)
+    return hits
 
 
 def render(kb, k):
