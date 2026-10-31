@@ -25,8 +25,8 @@ def embed(records, model):
         vecs = model.encode([r["text"] for r in records], normalize_embeddings=True)
         return vecs.astype("float32")
     """
-    # ✏️ TODO: 임베딩 행렬을 만들어 반환하세요.
-    raise NotImplementedError("embed 를 구현하세요 (Stage 3)")
+    vecs = model.encode([r["text"] for r in records], normalize_embeddings=True)
+    return vecs.astype("float32")
 
 
 def pca_2d(emb):

@@ -124,8 +124,11 @@ def build_prompt(query, hits):
                   "컨텍스트에 없으면 '문서에서 찾을 수 없습니다'라고만 답하라.\n\n"
                   f"[컨텍스트]\n{context}\n\n[질문]\n{query}\n\n[답변]")
     """
-    # ✏️ TODO: 컨텍스트 + 지시문으로 prompt 를 만들고 (prompt, context) 반환.
-    raise NotImplementedError("build_prompt 를 구현하세요 (Stage 6)")
+    context = "\n\n".join(f"[{h['source']}#{h['chunk_id']}] {h['text']}" for h in hits)
+    prompt = ("아래 [컨텍스트]만 근거로 한국어로 간결하게 답하라. "
+              "컨텍스트에 없으면 '문서에서 찾을 수 없습니다'라고만 답하라.\n\n"
+              f"[컨텍스트]\n{context}\n\n[질문]\n{query}\n\n[답변]")
+    return prompt, context
 
 
 def generate(prompt, context, provider="auto", model=None, temperature=0.2):

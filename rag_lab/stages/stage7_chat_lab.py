@@ -41,5 +41,14 @@ def render(kb, k):
     # [제공] LLM 제공자 선택 (Gemini / 로컬 Ollama) — generate 에 그대로 넘기면 됨
     provider, model = llm_controls("lab_chat_")
 
-    # ✏️ TODO: 위 provider, model 을 generate 에 넘기는 멀티턴 대화 루프를 구현하세요.
-    raise NotImplementedError("Stage 7 챗봇 대화 루프를 구현하세요 (provider, model 을 generate 에 전달)")
+    st.session_state.setdefault("lab_msgs", [])
+    for m in st.session_state.lab_msgs:
+        st.chat_message(m["role"]).write(m["content"])
+    if q := st.chat_input("문서 내용을 질문하세요"):
+        st.chat_message("user").write(q)
+        hits = retrieve(q, k)
+        prompt, ctx = build_prompt(q, hits)
+        ans = generate(prompt, ctx, provider, model)
+        st.chat_message("assistant").write(ans)
+        st.session_state.lab_msgs += [{"role": "user", "content": q},
+                                      {"role": "assistant", "content": ans}]
