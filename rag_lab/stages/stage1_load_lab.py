@@ -25,8 +25,8 @@ def read_pdf(data: bytes) -> str:
         reader = PdfReader(io.BytesIO(data))
         first = reader.pages[0].extract_text() or ""
     """
-    # ✏️ TODO: 전체 페이지 텍스트를 합쳐 반환하세요.
-    raise NotImplementedError("read_pdf 를 구현하세요 (Stage 1)")
+    reader = PdfReader(io.BytesIO(data))
+    return "\n".join((p.extract_text() or "") for p in reader.pages)
 
 
 def load_documents(files, include_folder):
@@ -46,8 +46,16 @@ def load_documents(files, include_folder):
         text = read_pdf(data) if ext == ".pdf" else data.decode("utf-8", "ignore")
     """
     docs = []
-    # ✏️ TODO: 업로드 파일과 docs/ 폴더를 읽어 docs 를 채우고 반환하세요.
-    raise NotImplementedError("load_documents 를 구현하세요 (Stage 1)")
+    for f in files or []:
+        suffix = Path(f.name).suffix.lower()
+        data = f.getvalue()
+        text = read_pdf(data) if suffix == ".pdf" else data.decode("utf-8", "ignore")
+        docs.append({"source": Path(f.name).stem, "text": text})
+    if include_folder:
+        for path in sorted(glob("docs/*")):
+            docs.append({"source": Path(path).stem,
+                         "text": Path(path).read_text(encoding="utf-8", errors="ignore")})
+    return docs
 
 
 def render(kb):

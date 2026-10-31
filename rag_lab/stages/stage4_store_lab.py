@@ -17,8 +17,9 @@ def build_index(emb):
         index.add(emb)
         return index
     """
-    # ✏️ TODO: FAISS 내적 인덱스를 만들어 벡터를 넣고 반환하세요.
-    raise NotImplementedError("build_index 를 구현하세요 (Stage 4)")
+    index = faiss.IndexFlatIP(emb.shape[1])
+    index.add(emb)
+    return index
 
 
 def render(kb):
