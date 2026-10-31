@@ -19,8 +19,12 @@ def chunk_text(text: str, size: int, overlap: int):
             out.append(text[i:i+size])
             i += max(1, size - overlap)
     """
-    # ✏️ TODO: 위 골격을 완성해 조각 리스트를 반환하세요.
-    raise NotImplementedError("chunk_text 를 구현하세요 (Stage 2)")
+    text = text.strip()
+    out, i = [], 0
+    while i < len(text):
+        out.append(text[i:i + size])
+        i += max(1, size - overlap)
+    return out
 
 
 def make_chunks(docs, size, overlap):
@@ -38,8 +42,11 @@ def make_chunks(docs, size, overlap):
                 records.append({"source": d["source"], "chunk_id": j, "text": c})
     """
     records = []
-    # ✏️ TODO: 모든 문서를 조각내 메타를 붙인 records 를 채우고 반환하세요.
-    raise NotImplementedError("make_chunks 를 구현하세요 (Stage 2)")
+    for d in docs:
+        for j, c in enumerate(chunk_text(d["text"], size, overlap)):
+            if c.strip():
+                records.append({"source": d["source"], "chunk_id": j, "text": c})
+    return records
 
 
 def render(kb):
