@@ -12,7 +12,7 @@ import streamlit as st
 from stages.stage5_search_lab import retrieve
 
 try:
-    import google.generativeai as genai
+    from google import genai              # google-genai (신 SDK) — 구 google-generativeai 아님
     _HAS_GENAI = True
 except ImportError:
     _HAS_GENAI = False
@@ -26,7 +26,7 @@ except ImportError:
 # anthropic 미설치 시 except 절에서 아무것도 매칭하지 않는 빈 튜플
 _ANTHROPIC_ERRORS = (anthropic.AnthropicError,) if _HAS_ANTHROPIC else ()
 
-GEN_MODEL = "gemini-2.5-flash"
+GEN_MODEL = "gemini-3.6-flash"      # 2.5-flash 는 신규 사용 중단(404)
 CLAUDE_MODEL = "claude-haiku-4-5"
 OLLAMA_URL = "http://localhost:11434"
 OLLAMA_MODEL = "qwen2.5:14b"
@@ -145,10 +145,11 @@ def generate(prompt, context, provider="auto", model=None, temperature=0.2):
             return _gen_ollama(prompt, model or OLLAMA_MODEL, temperature)
         if not (_HAS_GENAI and _get_api_key()):
             return "_(LLM 키 없음 — 검색 근거만 표시)_\n\n" + context
-        genai.configure(api_key=_get_api_key())
-        cfg = genai.types.GenerationConfig(temperature=temperature)
-        return genai.GenerativeModel(model or GEN_MODEL).generate_content(
-            prompt, generation_config=cfg).text.strip()
+        client = genai.Client(api_key=_get_api_key())
+        cfg = genai.types.GenerateContentConfig(temperature=temperature)
+        resp = client.models.generate_content(
+            model=model or GEN_MODEL, contents=prompt, config=cfg)
+        return (resp.text or "").strip()
     except _ANTHROPIC_ERRORS as e:                 # 인증 실패·한도 초과·요청 오류 등
         return f"_(Claude 호출 실패 · {e.__class__.__name__}: {e})_\n\n" + context
     except urllib.error.HTTPError as e:           # 서버는 떴는데 응답 오류(예: 모델 미설치 404)
@@ -178,6 +179,8 @@ def llm_controls(prefix=""):
             st.caption("⚠️ Ollama 미연결 — `ollama serve` 후 `ollama pull` 필요")
     elif provider == "claude" and not (_HAS_ANTHROPIC and _get_claude_key()):
         st.caption("⚠️ Claude 사용 불가 — `pipenv install anthropic` + CLAUDE_API_KEY 설정 필요")
+    elif provider == "gemini" and not (_HAS_GENAI and _get_api_key()):
+        st.caption("⚠️ Gemini 사용 불가 — `pipenv install google-genai` + GEMINI_API_KEY 설정 필요")
     return provider, model
 
 
